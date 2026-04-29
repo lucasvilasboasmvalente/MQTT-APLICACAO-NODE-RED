@@ -1,0 +1,238 @@
+[
+  {
+    "id": "f1a2b3c4d5e6f001",
+    "type": "tab",
+    "label": "Dashboard MQTT Casa",
+    "disabled": false,
+    "info": "Fluxo padrão para dashboard MQTT."
+  },
+  {
+    "id": "b111111111111111",
+    "type": "mqtt-broker",
+    "name": "HiveMQ Publico",
+    "broker": "broker.hivemq.com",
+    "port": "1883",
+    "clientid": "",
+    "autoConnect": true,
+    "usetls": false,
+    "protocolVersion": "4",
+    "keepalive": "60",
+    "cleansession": true,
+    "autoUnsubscribe": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthRetain": "false",
+    "birthPayload": "",
+    "birthMsg": {},
+    "closeTopic": "",
+    "closeQos": "0",
+    "closeRetain": "false",
+    "closePayload": "",
+    "closeMsg": {},
+    "willTopic": "",
+    "willQos": "0",
+    "willRetain": "false",
+    "willPayload": "",
+    "willMsg": {},
+    "userProps": "",
+    "sessionExpiry": ""
+  },
+  {
+    "id": "c111111111111111",
+    "type": "ui_tab",
+    "name": "Automacao Residencial",
+    "icon": "dashboard",
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "d111111111111111",
+    "type": "ui_group",
+    "name": "Sala",
+    "tab": "c111111111111111",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": false,
+    "className": ""
+  },
+  {
+    "id": "n111111111111111",
+    "type": "mqtt in",
+    "z": "f1a2b3c4d5e6f001",
+    "name": "Status lampada",
+    "topic": "casa/sala/lampada/status",
+    "qos": "0",
+    "datatype": "auto-detect",
+    "broker": "b111111111111111",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 140,
+    "y": 120,
+    "wires": [
+      [
+        "n222222222222222"
+      ]
+    ]
+  },
+  {
+    "id": "n222222222222222",
+    "type": "json",
+    "z": "f1a2b3c4d5e6f001",
+    "name": "parse json",
+    "property": "payload",
+    "action": "",
+    "pretty": false,
+    "x": 340,
+    "y": 120,
+    "wires": [
+      [
+        "n333333333333333"
+      ]
+    ]
+  },
+  {
+    "id": "n333333333333333",
+    "type": "function",
+    "z": "f1a2b3c4d5e6f001",
+    "name": "atualiza estado painel",
+    "func": "const ligada = msg.payload && msg.payload.ligada === true;\nconst brilhoEntrada = Number(msg.payload && msg.payload.brilho);\nconst brilho = Number.isFinite(brilhoEntrada)\n    ? Math.max(0, Math.min(100, Math.round(brilhoEntrada)))\n    : 0;\n\nflow.set(\"lampadaBrilho\", brilho);\nflow.set(\"lampadaLigada\", ligada);\n\nconst msgBrilho = { payload: brilho };\nconst msgStatus = { payload: ligada ? `Ligada (${brilho}%)` : `Desligada (${brilho}%)` };\n\nreturn [msgBrilho, msgStatus];",
+    "outputs": 2,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 560,
+    "y": 120,
+    "wires": [
+      [
+        "n555555555555555"
+      ],
+      [
+        "n666666666666666"
+      ]
+    ]
+  },
+  {
+    "id": "n555555555555555",
+    "type": "ui_gauge",
+    "z": "f1a2b3c4d5e6f001",
+    "name": "Brilho da lampada",
+    "group": "d111111111111111",
+    "order": 1,
+    "width": "6",
+    "height": "4",
+    "gtype": "gage",
+    "title": "Brilho da lampada",
+    "label": "%",
+    "format": "{{value}}",
+    "min": "0",
+    "max": "100",
+    "colors": [
+      "#00b500",
+      "#e6e600",
+      "#ca3838"
+    ],
+    "seg1": "33",
+    "seg2": "66",
+    "diff": false,
+    "className": "",
+    "x": 820,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "n666666666666666",
+    "type": "ui_text",
+    "z": "f1a2b3c4d5e6f001",
+    "group": "d111111111111111",
+    "order": 2,
+    "width": "6",
+    "height": "1",
+    "name": "Estado lampada",
+    "label": "Estado da lampada",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "className": "",
+    "style": false,
+    "font": "",
+    "fontSize": "",
+    "color": "#111111",
+    "x": 810,
+    "y": 160,
+    "wires": []
+  },
+  {
+    "id": "n777777777777777",
+    "type": "ui_button",
+    "z": "f1a2b3c4d5e6f001",
+    "name": "Aumentar brilho",
+    "group": "d111111111111111",
+    "order": 3,
+    "width": "6",
+    "height": "1",
+    "passthru": false,
+    "label": "Aumentar brilho (+10%)",
+    "tooltip": "",
+    "color": "",
+    "bgcolor": "#1f78d1",
+    "className": "",
+    "icon": "power_settings_new",
+    "payload": "",
+    "payloadType": "str",
+    "topic": "casa/sala/lampada/cmd",
+    "topicType": "str",
+    "x": 170,
+    "y": 260,
+    "wires": [
+      [
+        "n888888888888888"
+      ]
+    ]
+  },
+  {
+    "id": "n888888888888888",
+    "type": "function",
+    "z": "f1a2b3c4d5e6f001",
+    "name": "incrementa brilho e envia cmd",
+    "func": "let brilhoAtual = Number(flow.get(\"lampadaBrilho\"));\nif (!Number.isFinite(brilhoAtual)) {\n    brilhoAtual = 0;\n}\n\nconst novoBrilho = Math.min(100, brilhoAtual + 10);\nflow.set(\"lampadaBrilho\", novoBrilho);\nflow.set(\"lampadaLigada\", true);\n\nconst mqttMsg = {\n    topic: \"casa/sala/lampada/cmd\",\n    payload: { acao: \"ligar\", brilho: novoBrilho }\n};\n\nconst gaugeMsg = { payload: novoBrilho };\nconst statusMsg = { payload: `Ligada (${novoBrilho}%)` };\n\nreturn [mqttMsg, gaugeMsg, statusMsg];",
+    "outputs": 3,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 390,
+    "y": 260,
+    "wires": [
+      [
+        "n999999999999999"
+      ],
+      [
+        "n555555555555555"
+      ],
+      [
+        "n666666666666666"
+      ]
+    ]
+  },
+  {
+    "id": "n999999999999999",
+    "type": "mqtt out",
+    "z": "f1a2b3c4d5e6f001",
+    "name": "Publica cmd lampada",
+    "topic": "casa/sala/lampada/cmd",
+    "qos": "",
+    "retain": "",
+    "respTopic": "",
+    "contentType": "",
+    "userProps": "",
+    "correl": "",
+    "expiry": "",
+    "broker": "b111111111111111",
+    "x": 640,
+    "y": 260,
+    "wires": []
+  }
+]

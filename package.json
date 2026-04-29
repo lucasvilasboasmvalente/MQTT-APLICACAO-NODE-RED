@@ -1,5 +1,10 @@
 {
+  "scripts": {
+    "dashboard": "node-red --port 1880 --userDir .nodered-local --flowFile dashboard_padrao_flow.json"
+  },
   "dependencies": {
-    "mqtt": "^5.15.1"
+    "mqtt": "^5.15.1",
+    "node-red": "^4.1.8",
+    "node-red-dashboard": "^3.6.6"
   }
 }
